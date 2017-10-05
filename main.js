@@ -4,6 +4,7 @@
 
 
 const AUTH_KEY = 'AIzaSyDsUCcz1-Fwcf_G5IPn858lI4jO8GONcyc';
+const New_Key = 'AIzaSyCprVAwI3TpDPCNnlesm0G3JyRtgEyh9U4';
 const GEOCODE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 //const SEARCH_ENDPOINT = 'https://maps.googleapis.com/maps/api/place/nearbysearch/output?parameters';
 
@@ -36,6 +37,16 @@ function getSearchLocation(searchValue, callback) {
   $.getJSON(GEOCODE_URL, query, callback);
 }
 
+function getRestaurantData(callback) {
+  const query = {
+    key: New_Key,
+    location: {lat: STORE.latitude, lgn: STORE.longitude},
+    radius: 100
+  }
+  $.getJSON(GEOCODE_URL, query, data => {
+    console.log(data);
+  })
+  }
 
 
 
