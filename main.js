@@ -3,17 +3,42 @@
 /* global google */
 
 const AUTH_KEY = 'AIzaSyDsUCcz1-Fwcf_G5IPn858lI4jO8GONcyc';
-const New_Key = 'AIzaSyCprVAwI3TpDPCNnlesm0G3JyRtgEyh9U4';
 const GEOCODE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
+const ZOOM = 16;
+const RADIUS = 500;
+const PLACES = ['restaurant'];
+
+const htmlMap = document.getElementById('map');
 
 const STORE = {
   searchTerm: null,
-  latitude: 30.2946438,
-  longitude: -97.7025981,
+  latitude: -33.867,
+  longitude: 151.195,
   map: null,
   keyword: null,
   place_id: null
 };
+
+function getLocation() {
+  console.log('====================================');
+  console.log(navigator);
+  console.log('====================================');
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position, error) => {
+
+      if (error == null) {
+        STORE.latitude = position.coords.latitude;
+        STORE.longitude = position.coords.longitude;
+
+        initMap();
+      } else {
+        initMap();
+      }
+    });
+  } else {
+    initMap();
+  }
+}
 
 // Test Ping to API
 const name = 'richmond';
@@ -49,17 +74,11 @@ function getSearchLocation(searchValue, callback) {
 
 
 function genereateDataList(data) {
-    console.log('herehere', data);
   STORE.latitude = data.results[0].geometry.location.lat;
   STORE.longitude = data.results[0].geometry.location.lng;
   STORE.place_id = data.results[0].place_id;
-  const results = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${STORE.latitude},${STORE.longitude}&radius=500&types=restaurant&name=food&key=${AUTH_KEY}`;
-  console.log(results); 
-  $('.js-search-results').html(results);
+  initMap();
 }
-
-
-
 
 
 function handleSearchClick() {
@@ -69,31 +88,36 @@ function handleSearchClick() {
     const searchTarget = $(event.currentTarget).find('.js-query');
     const search = searchTarget.val();
     STORE.searchTerm = search;
+    console.log('====================================');
+    console.log('s', search);
+    console.log('====================================');
     searchTarget.val('');
-    
+
     getSearchLocation(search, genereateDataList);
     //initMap();
   });
 }
 
 
-var map;
-var infowindow;
+let map;
+let infowindow;
 
 function initMap() {
-  var searchPlace = {lat: STORE.latitude, lng:  STORE.longitude};
+  const searchPlace = {lat: STORE.latitude, lng:  STORE.longitude};
 
-  map = new google.maps.Map(document.getElementById('map'), {
+  map = new google.maps.Map(htmlMap, {
     center: searchPlace,
-    zoom: 20
+    zoom: ZOOM
   });
 
+
   infowindow = new google.maps.InfoWindow();
-  var service = new google.maps.places.PlacesService(map);
+
+  const service = new google.maps.places.PlacesService(map);
   service.nearbySearch({
     location: searchPlace,
-    radius: 500,
-    type: ['restaurant']
+    radius: RADIUS,
+    type: PLACES
   }, callback);
 }
 
@@ -106,11 +130,21 @@ function callback(results, status) {
 }
 
 function createMarker(place) {
-  var placeLoc = place.geometry.location;
-  var marker = new google.maps.Marker({
+  const placeLoc = place.geometry.location;
+  const marker = new google.maps.Marker({
     map: map,
     position: place.geometry.location
   });
+
+  marker.addListener('click', toggleBounce);
+
+  function toggleBounce() {
+    if (marker.getAnimation() !== null) {
+      marker.setAnimation(null);
+    } else {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+    }
+  }
 
   google.maps.event.addListener(marker, 'click', function() {
     infowindow.setContent(place.name);
@@ -125,5 +159,4 @@ function createMarker(place) {
 
 $(() => {
   handleSearchClick();
-  initMap();
 });
