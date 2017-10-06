@@ -62,6 +62,7 @@ function genereateDataList(data) {
   STORE.latitude = data.results[0].geometry.location.lat;
   STORE.longitude = data.results[0].geometry.location.lng;
   initMap();
+  
 }
 
 /*********************   Event Handlers   *********************/
@@ -74,6 +75,9 @@ function handleSearchClick() {
     STORE.searchTerm = search;
     searchTarget.val('');
     getSearchLocation(search, genereateDataList);
+    $('#map').show();
+    $('.js-search-results').show();
+    
   });
 }
 
@@ -144,4 +148,3 @@ google.maps.event.addDomListener(window, 'load', initialize);
 $(() => {
   handleSearchClick();
 });
-
