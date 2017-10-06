@@ -19,14 +19,12 @@ const STORE = {
   place_id: null
 };
 
-function getLocation() {
+function getUserLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((position, error) => {
-
       if (error === null) {
         STORE.latitude = position.coords.latitude;
         STORE.longitude = position.coords.longitude;
-
         initMap();
       } else {
         initMap();
@@ -37,14 +35,7 @@ function getLocation() {
   }
 }
 
-// Test Ping to API
-// const name = 'richmond';
-// $.getJSON(GEOCODE_URL, {
-//   address: name,
-//   key: AUTH_KEY
-// }, data => {
-//   console.log(data);
-// });
+/*********************   API Query   *********************/
 
 function getSearchLocation(searchValue, callback) {
   const query = {
@@ -54,30 +45,26 @@ function getSearchLocation(searchValue, callback) {
   $.getJSON(GEOCODE_URL, query, callback);
 }
 
+/*********************   HTML Generators   *********************/
+
 function renderHTML(results) {
   console.log(results);
   return (
     `<div>
-   <span><a href="https://www.google.com/maps/place/?q=place_id:${results.place_id}" target="_blank">
-   ${results.name}</a> (${results.vicinity})<span>
-   <p>Rating: ${results.rating}, Price_level: ${results.rating}</p>
-   </div>
-    `);
+      <span><a href="https://www.google.com/maps/place/?q=place_id:${results.place_id}" target="_blank">
+      ${results.name}</a> (${results.vicinity})<span>
+      <p>Rating: ${results.rating}, Price_level: ${results.rating}</p>
+    </div>`
+  );
 }
-
-// run auto complete
-function initialize() {
-  
-  let input = document.getElementById('searchTextField');
-  let autocomplete = new google.maps.places.Autocomplete(input);
-}
-google.maps.event.addDomListener(window, 'load', initialize);
 
 function genereateDataList(data) {
   STORE.latitude = data.results[0].geometry.location.lat;
   STORE.longitude = data.results[0].geometry.location.lng;
   initMap();
 }
+
+/*********************   Event Handlers   *********************/
 
 function handleSearchClick() {
   $('.js-search-form').submit(event => {
@@ -90,6 +77,7 @@ function handleSearchClick() {
   });
 }
 
+/*********************   GOOGLE MAPS API   *********************/
 
 let map;
 let infowindow;
@@ -130,8 +118,8 @@ function createMarker(place) {
     position: place.geometry.location
   });
 
-  marker.addListener('click', toggleBounce);
 
+  marker.addListener('click', toggleBounce);
   function toggleBounce() {
     if (marker.getAnimation() !== null) {
       marker.setAnimation(null);
@@ -145,6 +133,13 @@ function createMarker(place) {
     infowindow.open(map, this);
   });
 }
+
+function initialize() {
+  let input = document.getElementById('searchTextField');
+  let autocomplete = new google.maps.places.Autocomplete(input);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+
 
 $(() => {
   handleSearchClick();
