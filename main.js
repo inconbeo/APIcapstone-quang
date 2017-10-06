@@ -58,7 +58,7 @@ function renderHTML(results) {
   console.log(results);
   return (
     `<div>
-   <p>${results.name}, ${results.vicinity}<p>
+   <p><span>${results.name}</span>, ${results.vicinity}<p>
   </div>
     `);
 
@@ -73,7 +73,6 @@ function genereateDataList(data) {
 function handleSearchClick() {
   $('.js-search-form').submit(event => {
     event.preventDefault();
-    console.log('hit search');
     const searchTarget = $(event.currentTarget).find('.js-query');
     const search = searchTarget.val();
     STORE.searchTerm = search;
