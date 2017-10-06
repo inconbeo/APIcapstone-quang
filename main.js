@@ -58,7 +58,7 @@ function renderHTML(results) {
   console.log(results);
   return (
     `<div>
-   <span><a href='https://www.google.com/maps/place/?q=place_id:${results.place_id}'>
+   <span><a href="https://www.google.com/maps/place/?q=place_id:${results.place_id}" target="_blank">
    ${results.name}</a> (${results.vicinity})<span>
    <p>Rating: ${results.rating}, Price_level: ${results.rating}</p>
    </div>
