@@ -1,33 +1,41 @@
 'use strict';
 /* global $ */
-
-
+/* global google */
 
 const AUTH_KEY = 'AIzaSyDsUCcz1-Fwcf_G5IPn858lI4jO8GONcyc';
-const New_Key = 'AIzaSyCprVAwI3TpDPCNnlesm0G3JyRtgEyh9U4';
 const GEOCODE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
-//const SEARCH_ENDPOINT = 'https://maps.googleapis.com/maps/api/place/nearbysearch/output?parameters';
+const ZOOM = 16;
+const RADIUS = 500;
+const PLACES = ['restaurant'];
+
+const htmlMap = document.getElementById('map');
 
 const STORE = {
   searchTerm: null,
-  latitude: null,
-  longitude: null,
+  latitude: 40.6645459,
+  longitude: -73.9539815,
   map: null,
-  keyword: null
+  keyword: null,
+  place_id: null
 };
 
+function getUserLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition((position, error) => {
+      if (error === null) {
+        STORE.latitude = position.coords.latitude;
+        STORE.longitude = position.coords.longitude;
+        initMap();
+      } else {
+        initMap();
+      }
+    });
+  } else {
+    initMap();
+  }
+}
 
-
-// Test Ping to API
-const name = 'richmond';
-$.getJSON(GEOCODE_URL, {
-  address: name,
-  key: AUTH_KEY
-}, data => {
-  console.log(data);
-});
-
-
+/*********************   API Query   *********************/
 
 function getSearchLocation(searchValue, callback) {
   const query = {
@@ -37,46 +45,104 @@ function getSearchLocation(searchValue, callback) {
   $.getJSON(GEOCODE_URL, query, callback);
 }
 
-function getRestaurantData(callback) {
-  const query = {
-    key: New_Key,
-    location: {lat: STORE.latitude, lgn: STORE.longitude},
-    radius: 100
-  }
-  $.getJSON(GEOCODE_URL, query, data => {
-    console.log(data);
-  })
-  }
+/*********************   HTML Generators   *********************/
 
-
-
+function renderHTML(results) {
+  console.log(results);
+  return (
+    `<div>
+      <span><a href="https://www.google.com/maps/place/?q=place_id:${results.place_id}" target="_blank">
+      ${results.name}</a> (${results.vicinity})<span>
+      <p>Rating: ${results.rating}, Price_level: ${results.rating}</p>
+    </div>`
+  );
+}
 
 function genereateDataList(data) {
   STORE.latitude = data.results[0].geometry.location.lat;
   STORE.longitude = data.results[0].geometry.location.lng;
-  const results = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${STORE.latitude},${STORE.longitude}&radius=500&types=restaurant&name=food&key=${AUTH_KEY}`;
-  console.log(results); 
+  initMap();
+  
 }
 
-
-
-
+/*********************   Event Handlers   *********************/
 
 function handleSearchClick() {
   $('.js-search-form').submit(event => {
     event.preventDefault();
-    console.log('hit search');
     const searchTarget = $(event.currentTarget).find('.js-query');
     const search = searchTarget.val();
     STORE.searchTerm = search;
     searchTarget.val('');
     getSearchLocation(search, genereateDataList);
+    $('#map').show();
+    $('.js-search-results').show();
+    
   });
 }
 
+/*********************   GOOGLE MAPS API   *********************/
 
-//https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670,151.1957&radius=500&types=food&name=cruise&key=YOUR_API_KEY
-//https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJN1t_tDeuEmsRUsoyG83frY4&key=YOUR_API_KEY
+let map;
+let infowindow;
+
+function initMap() {
+  const searchPlace = {lat: STORE.latitude, lng:  STORE.longitude};
+
+  map = new google.maps.Map(htmlMap, {
+    center: searchPlace,
+    zoom: ZOOM
+  });
+
+
+  infowindow = new google.maps.InfoWindow();
+
+  const service = new google.maps.places.PlacesService(map);
+  service.nearbySearch({
+    location: searchPlace,
+    radius: RADIUS,
+    type: PLACES
+  }, callback);
+}
+
+function callback(results, status) {
+  if (status === google.maps.places.PlacesServiceStatus.OK) {
+    for (let i = 0; i < results.length; i++) {
+      createMarker(results[i]);
+    }
+    const list = results.map((item) => renderHTML(item));
+    $('.js-search-results').html(list);
+  }
+}
+
+function createMarker(place) {
+  const placeLoc = place.geometry.location;
+  const marker = new google.maps.Marker({
+    map: map,
+    position: place.geometry.location
+  });
+
+
+  marker.addListener('click', toggleBounce);
+  function toggleBounce() {
+    if (marker.getAnimation() !== null) {
+      marker.setAnimation(null);
+    } else {
+      marker.setAnimation(google.maps.Animation.BOUNCE);
+    }
+  }
+
+  google.maps.event.addListener(marker, 'click', function() {
+    infowindow.setContent(place.name);
+    infowindow.open(map, this);
+  });
+}
+
+function initialize() {
+  let input = document.getElementById('searchTextField');
+  let autocomplete = new google.maps.places.Autocomplete(input);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
 
 
 $(() => {

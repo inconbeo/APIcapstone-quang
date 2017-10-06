@@ -1,3 +1,59 @@
 #map {
-    height: 400px;
+    height: 500px;
+}
+
+span {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+h1, .js-search-results, .js-search-form {
+    padding: 10px;
+    font-size: 40px;
+    
+}
+
+.js-search-results {
+    display: none;
+}
+
+#map {
+    display: none;
+}
+
+
+
+a {
+    text-decoration: none;
+}
+
+main {
+    background-color: #faf0eb;
+    text-align: center;
+}
+
+body {
+    font-family: Garamond;
+    font-weight: normal;
+    font-style: italic;
+}
+
+.js-query {
+    height: 25px;
+    width: 300px;
+    font-size: 18px
+}
+
+p {
+    color: red;
+}
+
+span {
+    font-weight: normal;
+}
+
+button {
+    padding: 6px 12px;
+    font-size: 16px;
+    border-radius: 5px;
 }
