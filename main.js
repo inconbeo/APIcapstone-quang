@@ -61,7 +61,6 @@ function renderHTML(results) {
    <p><span>${results.name}</span>, ${results.vicinity}<p>
   </div>
     `);
-
 }
 
 function genereateDataList(data) {
