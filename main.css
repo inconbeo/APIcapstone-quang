@@ -10,7 +10,18 @@ span {
 h1, .js-search-results, .js-search-form {
     padding: 10px;
     font-size: 40px;
+    
 }
+
+.js-search-results {
+    display: none;
+}
+
+#map {
+    display: none;
+}
+
+
 
 a {
     text-decoration: none;
