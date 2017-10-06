@@ -23,7 +23,7 @@ function getLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((position, error) => {
 
-      if (error == null) {
+      if (error === null) {
         STORE.latitude = position.coords.latitude;
         STORE.longitude = position.coords.longitude;
 
@@ -58,10 +58,20 @@ function renderHTML(results) {
   console.log(results);
   return (
     `<div>
-   <p><span>${results.name}</span>, ${results.vicinity}<p>
-  </div>
+   <span><a href='https://www.google.com/maps/place/?q=place_id:${results.place_id}'>
+   ${results.name}</a> (${results.vicinity})<span>
+   <p>Rating: ${results.rating}, Price_level: ${results.rating}</p>
+   </div>
     `);
 }
+
+// run auto complete
+function initialize() {
+  
+  let input = document.getElementById('searchTextField');
+  let autocomplete = new google.maps.places.Autocomplete(input);
+}
+google.maps.event.addDomListener(window, 'load', initialize);
 
 function genereateDataList(data) {
   STORE.latitude = data.results[0].geometry.location.lat;
@@ -105,7 +115,7 @@ function initMap() {
 
 function callback(results, status) {
   if (status === google.maps.places.PlacesServiceStatus.OK) {
-    for (var i = 0; i < results.length; i++) {
+    for (let i = 0; i < results.length; i++) {
       createMarker(results[i]);
     }
     const list = results.map((item) => renderHTML(item));
@@ -139,3 +149,4 @@ function createMarker(place) {
 $(() => {
   handleSearchClick();
 });
+
