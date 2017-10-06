@@ -66,6 +66,12 @@ span {
     
 }
 
+.pac-item-query {
+    font-size: 13px!important;
+    padding-right: 3px!important;
+    color: silver!important;
+}
+
 
 
 /* .js-search-results {
