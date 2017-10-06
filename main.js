@@ -12,17 +12,14 @@ const htmlMap = document.getElementById('map');
 
 const STORE = {
   searchTerm: null,
-  latitude: -33.867,
-  longitude: 151.195,
+  latitude: 40.6645459,
+  longitude: -73.9539815,
   map: null,
   keyword: null,
   place_id: null
 };
 
 function getLocation() {
-  console.log('====================================');
-  console.log(navigator);
-  console.log('====================================');
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition((position, error) => {
 
@@ -41,14 +38,13 @@ function getLocation() {
 }
 
 // Test Ping to API
-const name = 'richmond';
-$.getJSON(GEOCODE_URL, {
-  address: name,
-  key: AUTH_KEY
-}, data => {
-  console.log(data);
-});
-
+// const name = 'richmond';
+// $.getJSON(GEOCODE_URL, {
+//   address: name,
+//   key: AUTH_KEY
+// }, data => {
+//   console.log(data);
+// });
 
 function getSearchLocation(searchValue, callback) {
   const query = {
@@ -58,28 +54,21 @@ function getSearchLocation(searchValue, callback) {
   $.getJSON(GEOCODE_URL, query, callback);
 }
 
-// function getRestaurantData() {
-//   const query = {
-//     key: New_Key,
-//     location: {lat: STORE.latitude, lgn: STORE.longitude},
-//     radius: 100,
-//     place_id: 'ChIJLwPMoJm1RIYRetVp1EtGm10'
-//   };
-//   $.getJSON(GEOCODE_URL, query, data => {
-//     console.log(data);
-//   });
-// }
+function renderHTML(results) {
+  console.log(results);
+  return (
+    `<div>
+   <p>${results.name}, ${results.vicinity}<p>
+  </div>
+    `);
 
-// getRestaurantData();
-
+}
 
 function genereateDataList(data) {
   STORE.latitude = data.results[0].geometry.location.lat;
   STORE.longitude = data.results[0].geometry.location.lng;
-  STORE.place_id = data.results[0].place_id;
   initMap();
 }
-
 
 function handleSearchClick() {
   $('.js-search-form').submit(event => {
@@ -88,13 +77,8 @@ function handleSearchClick() {
     const searchTarget = $(event.currentTarget).find('.js-query');
     const search = searchTarget.val();
     STORE.searchTerm = search;
-    console.log('====================================');
-    console.log('s', search);
-    console.log('====================================');
     searchTarget.val('');
-
     getSearchLocation(search, genereateDataList);
-    //initMap();
   });
 }
 
@@ -126,6 +110,8 @@ function callback(results, status) {
     for (var i = 0; i < results.length; i++) {
       createMarker(results[i]);
     }
+    const list = results.map((item) => renderHTML(item));
+    $('.js-search-results').html(list);
   }
 }
 
@@ -151,11 +137,6 @@ function createMarker(place) {
     infowindow.open(map, this);
   });
 }
-
-
-//https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=-33.8670,151.1957&radius=500&types=food&name=cruise&key=YOUR_API_KEY
-//https://maps.googleapis.com/maps/api/place/details/json?placeid=ChIJN1t_tDeuEmsRUsoyG83frY4&key=YOUR_API_KEY
-
 
 $(() => {
   handleSearchClick();
