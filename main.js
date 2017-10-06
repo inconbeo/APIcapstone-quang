@@ -52,8 +52,7 @@ function renderHTML(results) {
   return (
     `<div>
       <span><a href="https://www.google.com/maps/place/?q=place_id:${results.place_id}" target="_blank">
-      ${results.name}</a> (${results.vicinity})<span>
-      <p>Rating: ${results.rating}, Price Level: ${results.rating}</p>
+      ${results.name}(${results.vicinity}) Rating: ${results.rating}, Price Level: ${results.rating}</a></span>
     </div>`
   );
 }
